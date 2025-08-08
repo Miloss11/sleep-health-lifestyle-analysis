@@ -3,24 +3,30 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+import os
 
 st.set_page_config(page_title="Sleep Health & Lifestyle Analysis", layout="wide")
-import os
 
 @st.cache_data
 def load_data():
-    base_dir = os.path.dirname(__file__)  # folder gde se nalazi app.py
+    base_dir = os.path.dirname(__file__)
     csv_path = os.path.join(base_dir, 'Sleep_Health_Lifestyle_Analysis.csv')
     return pd.read_csv(csv_path)
 
 @st.cache_data
 def filter_data(df, genders, stress_levels, sleep_qualities, age_range):
-    return df[
+    filtered = df[
         (df['gender'].isin(genders)) &
         (df['stress_level'].isin(stress_levels)) &
         (df['sleep_quality'].isin(sleep_qualities)) &
         (df['age'].between(age_range[0], age_range[1]))
     ].copy()
+    return filtered
 
 df = load_data()
 
@@ -29,7 +35,7 @@ with st.sidebar.expander("Filter Options", expanded=True):
     selected_genders = st.multiselect("Select Gender(s)", genders, default=genders)
 
     stress_levels = df['stress_level'].unique().tolist()
-    selected_stress = st.multiselect("Select Stress Level(s)", stress_levels, default=stress_levels)
+    selected_stress_levels = st.multiselect("Select Stress Level(s)", stress_levels, default=stress_levels)
 
     sleep_qualities = df['sleep_quality'].unique().tolist()
     selected_sleep_qualities = st.multiselect("Select Sleep Quality(ies)", sleep_qualities, default=sleep_qualities)
@@ -37,7 +43,7 @@ with st.sidebar.expander("Filter Options", expanded=True):
     min_age, max_age = int(df['age'].min()), int(df['age'].max())
     age_range = st.slider("Select Age Range", min_age, max_age, (min_age, max_age))
 
-filtered_df = filter_data(df, selected_genders, selected_stress, selected_sleep_qualities, age_range)
+filtered_df = filter_data(df, selected_genders, selected_stress_levels, selected_sleep_qualities, age_range)
 
 st.title("Sleep Health & Lifestyle Analysis")
 
@@ -181,3 +187,57 @@ fig20 = px.bar(sleep_quality_counts, x='sleep_quality', y='count',
                labels={'sleep_quality': 'Sleep Quality', 'count': 'Count'},
                title='Counts of Sleep Quality Categories')
 st.plotly_chart(fig20, use_container_width=True, key='fig20')
+
+# Machine Learning Section
+
+st.header("Machine Learning Models: Predicting Sleep Hours")
+
+filtered_df_ml = filtered_df.copy()
+
+# Map categorical variables to numeric
+filtered_df_ml['stress_level_num'] = filtered_df_ml['stress_level'].map({'Low': 1, 'Medium': 2, 'High': 3})
+filtered_df_ml['sleep_quality_num'] = filtered_df_ml['sleep_quality'].map({'Poor': 1, 'Average': 2, 'Good': 3})
+
+filtered_df_ml = filtered_df_ml.dropna(subset=['age', 'bmi', 'stress_level_num', 'physical_activity', 'heart_rate', 'sleep_quality_num', 'sleep_hours'])
+
+X = filtered_df_ml[['age', 'bmi', 'stress_level_num', 'physical_activity', 'heart_rate', 'sleep_quality_num']]
+y = filtered_df_ml['sleep_hours']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+models = {
+    "Linear Regression": LinearRegression(),
+    "Decision Tree Regressor": DecisionTreeRegressor(random_state=42),
+    "Random Forest Regressor": RandomForestRegressor(random_state=42),
+}
+
+results = {}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    preds = model.predict(X_test)
+    mse = mean_squared_error(y_test, preds)
+    r2 = r2_score(y_test, preds)
+    results[name] = (mse, r2, preds)
+
+st.subheader("Model Evaluation Metrics")
+
+for name, (mse, r2, _) in results.items():
+    st.write(f"**{name}**")
+    st.write(f"Mean Squared Error (MSE): {mse:.3f}")
+    st.write(f"R-squared (R²): {r2:.3f}")
+    st.write("---")
+
+st.subheader("Actual vs Predicted Sleep Hours")
+
+for name, (_, _, preds) in results.items():
+    fig = px.scatter(x=y_test, y=preds,
+                     labels={'x': 'Actual Sleep Hours', 'y': 'Predicted Sleep Hours'},
+                     title=f'{name}: Actual vs Predicted')
+    fig.add_shape(
+        type="line",
+        line=dict(dash='dash'),
+        x0=y_test.min(), y0=y_test.min(),
+        x1=y_test.max(), y1=y_test.max()
+    )
+    st.plotly_chart(fig, use_container_width=True, key=f"ml_{name}")

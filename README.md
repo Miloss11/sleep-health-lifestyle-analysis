@@ -1,5 +1,10 @@
 # Sleep Health & Lifestyle Analysis
 
+## Live Demo
+
+Check out the live Streamlit app here:  
+https://sleep-health-lifestyle-analysis-49cnedggbws6u4y7atk85s.streamlit.app/
+
 ## Project Overview  
 This project analyzes how lifestyle factors affect sleep quality using a real-world health dataset. It includes data cleaning, exploratory analysis, and an interactive Streamlit dashboard to visualize insights.
 
@@ -61,7 +66,7 @@ Streamlit was chosen for its ease of use and interactive capabilities.
 - Streamlit for dashboard development  
 
 ## Machine Learning Integration  
-This project currently emphasizes exploratory data analysis and interactive visualizations to explore how lifestyle factors impact sleep quality. Future development plans include incorporating machine learning models to predict sleep quality and duration based on variables such as BMI, stress levels, and physical activity. Adding predictive analytics will enhance the dashboard’s functionality by providing actionable insights for better sleep health management.
+This project currently focuses on exploratory data analysis and interactive visualization to understand sleep health factors. Future plans include integrating machine learning models to predict sleep quality and sleep duration based on variables like BMI, stress levels, physical activity, age, and heart rate. Implementing predictive models will enhance the dashboard by providing actionable insights and personalized recommendations for improving sleep health.
 
 ## Data Sources and Acknowledgements  
 The dataset used for this analysis is publicly available on Kaggle and consists of anonymized health and lifestyle data collected from various individuals. This ensures compliance with privacy and ethical guidelines.
@@ -84,17 +89,6 @@ Visualization methods and dashboard design were developed using resources and in
 ## How to Use  
 1. Clone this repository.  
 2. Install the required packages listed in `requirements.txt` by running this command in your terminal:  
-```bash
-pip install -r requirements.txt
-
-## How to Use
-
-1. Clone this repository.
-
-2. Install the required packages listed in `requirements.txt` by running this command in your terminal:
-
-```bash
-pip install -r requirements.txt
 
 
 ## How to Use
@@ -112,6 +106,12 @@ pip install -r requirements.txt
 streamlit run app.py
 
 4. Use the sidebar filters to explore different aspects of the data and see how various lifestyle factors affect sleep quality.
+
+## Live Demo
+
+Check out the live Streamlit app here:  
+[Sleep Health Lifestyle Analysis](https://sleep-health-lifestyle-analysis-49cnedggbws6u4y7atk85s.streamlit.app/)
+
 
 ## Author
 
