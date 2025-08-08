@@ -4,171 +4,177 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load data with caching
+st.set_page_config(page_title="Sleep Health & Lifestyle Analysis", layout="wide")
+
 @st.cache_data
 def load_data():
     return pd.read_csv('Sleep_Health_Lifestyle_Analysis.csv')
 
+@st.cache_data
+def filter_data(df, genders, stress_levels, sleep_qualities, age_range):
+    return df[
+        (df['gender'].isin(genders)) &
+        (df['stress_level'].isin(stress_levels)) &
+        (df['sleep_quality'].isin(sleep_qualities)) &
+        (df['age'].between(age_range[0], age_range[1]))
+    ].copy()
+
 df = load_data()
 
-# App title
+with st.sidebar.expander("Filter Options", expanded=True):
+    genders = df['gender'].unique().tolist()
+    selected_genders = st.multiselect("Select Gender(s)", genders, default=genders)
+
+    stress_levels = df['stress_level'].unique().tolist()
+    selected_stress = st.multiselect("Select Stress Level(s)", stress_levels, default=stress_levels)
+
+    sleep_qualities = df['sleep_quality'].unique().tolist()
+    selected_sleep_qualities = st.multiselect("Select Sleep Quality(ies)", sleep_qualities, default=sleep_qualities)
+
+    min_age, max_age = int(df['age'].min()), int(df['age'].max())
+    age_range = st.slider("Select Age Range", min_age, max_age, (min_age, max_age))
+
+filtered_df = filter_data(df, selected_genders, selected_stress, selected_sleep_qualities, age_range)
+
 st.title("Sleep Health & Lifestyle Analysis")
 
-# Dataset preview
-st.subheader("Dataset Preview")
-st.dataframe(df.head())
-
-# 1. Average Sleep Hours by Gender (Bar Plot)
-st.subheader("Average Sleep Hours by Gender")
-fig1 = px.bar(df.groupby('gender')['sleep_hours'].mean().reset_index(),
-              x='gender', y='sleep_hours',
-              labels={'gender': 'Gender', 'sleep_hours': 'Average Sleep Hours'},
-              title='Average Sleep Hours by Gender')
-st.plotly_chart(fig1)
-
-# 2. Distribution of Gender (Pie Chart)
-st.subheader("Gender Distribution")
-gender_counts = df['gender'].value_counts().reset_index()
-gender_counts.columns = ['gender', 'count']
-fig2 = px.pie(gender_counts, values='count', names='gender', title='Gender Distribution')
-st.plotly_chart(fig2)
-
-# 3. BMI vs Sleep Hours Colored by Sleep Quality (Scatter Plot)
-st.subheader("BMI vs Sleep Hours Colored by Sleep Quality")
-fig3 = px.scatter(df, x='bmi', y='sleep_hours', color='sleep_quality',
+# 1. BMI vs Sleep Hours colored by Sleep Quality
+st.subheader("1. BMI vs Sleep Hours colored by Sleep Quality")
+fig1 = px.scatter(filtered_df, x='bmi', y='sleep_hours', color='sleep_quality',
                   labels={'bmi': 'BMI', 'sleep_hours': 'Sleep Hours', 'sleep_quality': 'Sleep Quality'},
                   title='BMI vs Sleep Hours Colored by Sleep Quality')
-st.plotly_chart(fig3)
+st.plotly_chart(fig1, use_container_width=True, key='fig1')
 
-# 4. Age vs Sleep Hours Colored by Gender (Scatter Plot)
-st.subheader("Age vs Sleep Hours by Gender")
-fig4 = px.scatter(df, x='age', y='sleep_hours', color='gender',
-                  labels={'age': 'Age', 'sleep_hours': 'Sleep Hours', 'gender': 'Gender'},
-                  title='Age vs Sleep Hours by Gender')
-st.plotly_chart(fig4)
+# 2. Distribution of Sleep Quality
+st.subheader("2. Distribution of Sleep Quality")
+fig2 = px.histogram(filtered_df, x='sleep_quality', title='Sleep Quality Count')
+st.plotly_chart(fig2, use_container_width=True, key='fig2')
 
-# 5. Physical Activity vs Sleep Hours (Scatter Plot)
-st.subheader("Physical Activity vs Sleep Hours")
-fig5 = px.scatter(df, x='physical_activity', y='sleep_hours',
-                  labels={'physical_activity': 'Physical Activity (hours)', 'sleep_hours': 'Sleep Hours'},
-                  title='Physical Activity vs Sleep Hours')
-st.plotly_chart(fig5)
+# 3. Age vs Sleep Hours colored by Sleep Quality
+st.subheader("3. Age vs Sleep Hours Colored by Sleep Quality")
+fig3 = px.scatter(filtered_df, x='age', y='sleep_hours', color='sleep_quality',
+                  labels={'age': 'Age', 'sleep_hours': 'Sleep Hours'},
+                  title='Age vs Sleep Hours Colored by Sleep Quality')
+st.plotly_chart(fig3, use_container_width=True, key='fig3')
 
-# 6. Sleep Quality Distribution (Bar Plot)
-st.subheader("Sleep Quality Distribution")
-sleep_quality_counts = df['sleep_quality'].value_counts().reset_index()
-sleep_quality_counts.columns = ['sleep_quality', 'count']
-fig6 = px.bar(sleep_quality_counts, x='sleep_quality', y='count',
-              labels={'sleep_quality': 'Sleep Quality', 'count': 'Count'},
-              title='Sleep Quality Distribution')
-st.plotly_chart(fig6)
+# 4. Sleep Hours Distribution by Gender (Box plot)
+st.subheader("4. Sleep Hours Distribution by Gender")
+fig4 = px.box(filtered_df, x='gender', y='sleep_hours',
+              labels={'gender': 'Gender', 'sleep_hours': 'Sleep Hours'},
+              title='Sleep Hours Distribution by Gender')
+st.plotly_chart(fig4, use_container_width=True, key='fig4')
 
-# 7. Heart Rate Distribution (Histogram)
-st.subheader("Heart Rate Distribution")
-fig7 = px.histogram(df, x='heart_rate', nbins=30,
-                    labels={'heart_rate': 'Heart Rate (bpm)'},
-                    title='Distribution of Heart Rate')
-st.plotly_chart(fig7)
+# 5. BMI Distribution by Sleep Quality (Violin plot)
+st.subheader("5. BMI Distribution by Sleep Quality")
+fig5 = px.violin(filtered_df, x='sleep_quality', y='bmi', box=True, points='all',
+                 labels={'sleep_quality': 'Sleep Quality', 'bmi': 'BMI'},
+                 title='BMI Distribution by Sleep Quality')
+st.plotly_chart(fig5, use_container_width=True, key='fig5')
 
-# 8. Stress Level Distribution (Bar Plot)
-st.subheader("Stress Level Distribution")
-stress_counts = df['stress_level'].value_counts().reset_index()
-stress_counts.columns = ['stress_level', 'count']
-fig8 = px.bar(stress_counts, x='stress_level', y='count',
-              labels={'stress_level': 'Stress Level', 'count': 'Count'},
-              title='Stress Level Distribution')
-st.plotly_chart(fig8)
+# 6. Distribution of Stress Levels
+st.subheader("6. Distribution of Stress Levels")
+fig6 = px.histogram(filtered_df, x='stress_level', title='Stress Level Count')
+st.plotly_chart(fig6, use_container_width=True, key='fig6')
 
-# 9. Average Sleep Hours by Stress Level (Bar Plot)
-st.subheader("Average Sleep Hours by Stress Level")
-fig9 = px.bar(df.groupby('stress_level')['sleep_hours'].mean().reset_index(),
-              x='stress_level', y='sleep_hours',
-              labels={'stress_level': 'Stress Level', 'sleep_hours': 'Average Sleep Hours'},
-              title='Average Sleep Hours by Stress Level')
-st.plotly_chart(fig9)
+# 7. Physical Activity vs Sleep Hours colored by Gender
+st.subheader("7. Physical Activity vs Sleep Hours Colored by Gender")
+fig7 = px.scatter(filtered_df, x='physical_activity', y='sleep_hours', color='gender',
+                  labels={'physical_activity': 'Physical Activity', 'sleep_hours': 'Sleep Hours'},
+                  title='Physical Activity vs Sleep Hours Colored by Gender')
+st.plotly_chart(fig7, use_container_width=True, key='fig7')
 
-# 10. Physical Activity Distribution (Histogram)
-st.subheader("Physical Activity Distribution")
-fig10 = px.histogram(df, x='physical_activity', nbins=30,
-                     labels={'physical_activity': 'Physical Activity (hours)'},
-                     title='Distribution of Physical Activity')
-st.plotly_chart(fig10)
+# 8. Heart Rate Distribution by Sleep Quality (Box plot)
+st.subheader("8. Heart Rate Distribution by Sleep Quality")
+fig8 = px.box(filtered_df, x='sleep_quality', y='heart_rate',
+              labels={'sleep_quality': 'Sleep Quality', 'heart_rate': 'Heart Rate'},
+              title='Heart Rate Distribution by Sleep Quality')
+st.plotly_chart(fig8, use_container_width=True, key='fig8')
 
-# 11. Correlation Heatmap of Numerical Features (matplotlib + seaborn)
-st.subheader("Correlation Heatmap of Numerical Features")
+# 9. Age vs BMI colored by Sleep Quality
+st.subheader("9. Age vs BMI Colored by Sleep Quality")
+fig9 = px.scatter(filtered_df, x='age', y='bmi', color='sleep_quality',
+                  labels={'age': 'Age', 'bmi': 'BMI'},
+                  title='Age vs BMI Colored by Sleep Quality')
+st.plotly_chart(fig9, use_container_width=True, key='fig9')
+
+# 10. Distribution of Gender
+st.subheader("10. Distribution of Gender")
+fig10 = px.histogram(filtered_df, x='gender', title='Gender Count')
+st.plotly_chart(fig10, use_container_width=True, key='fig10')
+
+# 11. Correlation Heatmap of Numerical Features
+st.subheader("11. Correlation Heatmap of Numerical Features")
 stress_map = {'Low': 1, 'Medium': 2, 'High': 3}
-df['stress_level_num'] = df['stress_level'].map(stress_map)
-corr = df[['age', 'bmi', 'sleep_hours', 'stress_level_num', 'physical_activity', 'heart_rate']].corr()
-plt.figure(figsize=(10, 7))
+filtered_df['stress_level_num'] = filtered_df['stress_level'].map(stress_map)
+corr = filtered_df[['age', 'bmi', 'sleep_hours', 'stress_level_num', 'physical_activity', 'heart_rate']].corr()
+
+plt.figure(figsize=(10,7))
 sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
 plt.title('Correlation Heatmap of Numerical Features')
 st.pyplot(plt.gcf())
 plt.clf()
 
-# 12. Age Distribution (Histogram)
-st.subheader("Age Distribution")
-fig12 = px.histogram(df, x='age', nbins=30,
-                    labels={'age': 'Age'},
-                    title='Age Distribution')
-st.plotly_chart(fig12)
+# 12. Sleep Hours Distribution by Gender (Box plot)
+st.subheader("12. Sleep Hours Distribution by Gender")
+fig12 = px.box(filtered_df, x='gender', y='sleep_hours',
+               labels={'gender': 'Gender', 'sleep_hours': 'Sleep Hours'},
+               title='Sleep Hours Distribution by Gender')
+st.plotly_chart(fig12, use_container_width=True, key='fig12')
 
-# 13. Sleep Hours Distribution (Histogram)
-st.subheader("Sleep Hours Distribution")
-fig13 = px.histogram(df, x='sleep_hours', nbins=30,
-                    labels={'sleep_hours': 'Sleep Hours'},
-                    title='Sleep Hours Distribution')
-st.plotly_chart(fig13)
+# 13. Stress Level Distribution by Sleep Quality (Violin plot)
+st.subheader("13. Stress Level Distribution by Sleep Quality")
+fig13 = px.violin(filtered_df, x='sleep_quality', y='stress_level', box=True, points='all',
+                  labels={'sleep_quality': 'Sleep Quality', 'stress_level': 'Stress Level'},
+                  title='Stress Level Distribution by Sleep Quality')
+st.plotly_chart(fig13, use_container_width=True, key='fig13')
 
-# 14. Boxplot of BMI by Gender
-st.subheader("BMI Distribution by Gender")
-fig14 = px.box(df, x='gender', y='bmi',
-               labels={'gender': 'Gender', 'bmi': 'BMI'},
-               title='BMI Distribution by Gender')
-st.plotly_chart(fig14)
+# 14. Pair Plot of Key Health Variables
+st.subheader("14. Pair Plot of Key Health Variables")
+pair_data = filtered_df[['age', 'bmi', 'sleep_hours', 'stress_level_num', 'physical_activity', 'heart_rate']]
+sns.pairplot(pair_data)
+st.pyplot(plt.gcf())
+plt.clf()
 
-# 15. Boxplot of Sleep Hours by Sleep Quality
-st.subheader("Sleep Hours Distribution by Sleep Quality")
-fig15 = px.box(df, x='sleep_quality', y='sleep_hours',
-               labels={'sleep_quality': 'Sleep Quality', 'sleep_hours': 'Sleep Hours'},
-               title='Sleep Hours Distribution by Sleep Quality')
-st.plotly_chart(fig15)
+# 15. Sleep Hours Distribution
+st.subheader("15. Sleep Hours Distribution")
+fig15 = px.histogram(filtered_df, x='sleep_hours', nbins=20,
+                     labels={'sleep_hours': 'Sleep Hours'},
+                     title='Sleep Hours Distribution')
+st.plotly_chart(fig15, use_container_width=True, key='fig15')
 
-# 16. Average Heart Rate by Sleep Quality (Bar Plot)
-st.subheader("Average Heart Rate by Sleep Quality")
-fig16 = px.bar(df.groupby('sleep_quality')['heart_rate'].mean().reset_index(),
-               x='sleep_quality', y='heart_rate',
-               labels={'sleep_quality': 'Sleep Quality', 'heart_rate': 'Average Heart Rate'},
-               title='Average Heart Rate by Sleep Quality')
-st.plotly_chart(fig16)
+# 16. Physical Activity vs Sleep Hours
+st.subheader("16. Physical Activity vs Sleep Hours")
+fig16 = px.scatter(filtered_df, x='physical_activity', y='sleep_hours',
+                   labels={'physical_activity': 'Physical Activity', 'sleep_hours': 'Sleep Hours'},
+                   title='Physical Activity vs Sleep Hours')
+st.plotly_chart(fig16, use_container_width=True, key='fig16')
 
-# 17. Scatter plot: Heart Rate vs BMI colored by Sleep Quality
-st.subheader("Heart Rate vs BMI Colored by Sleep Quality")
-fig17 = px.scatter(df, x='bmi', y='heart_rate', color='sleep_quality',
-                  labels={'bmi': 'BMI', 'heart_rate': 'Heart Rate', 'sleep_quality': 'Sleep Quality'},
-                  title='Heart Rate vs BMI Colored by Sleep Quality')
-st.plotly_chart(fig17)
+# 17. Heart Rate Distribution by Gender
+st.subheader("17. Heart Rate Distribution by Gender")
+fig17 = px.histogram(filtered_df, x='heart_rate', color='gender', barmode='overlay',
+                     labels={'heart_rate': 'Heart Rate', 'gender': 'Gender'},
+                     title='Heart Rate Distribution by Gender')
+st.plotly_chart(fig17, use_container_width=True, key='fig17')
 
-# 18. Scatter plot: Physical Activity vs Stress Level (mapped numerically)
-st.subheader("Physical Activity vs Stress Level")
-fig18 = px.scatter(df, x='physical_activity', y='stress_level_num',
-                  labels={'physical_activity': 'Physical Activity (hours)', 'stress_level_num': 'Stress Level (Numeric)'},
-                  title='Physical Activity vs Stress Level')
-st.plotly_chart(fig18)
+# 18. Stress Level Distribution by Gender (Box plot)
+st.subheader("18. Stress Level Distribution by Gender")
+fig18 = px.box(filtered_df, x='gender', y='stress_level',
+               labels={'gender': 'Gender', 'stress_level': 'Stress Level'},
+               title='Stress Level Distribution by Gender')
+st.plotly_chart(fig18, use_container_width=True, key='fig18')
 
-# 19. Bar plot: Count of Participants by Sleep Quality
-st.subheader("Count of Participants by Sleep Quality")
-sleep_quality_count = df['sleep_quality'].value_counts().reset_index()
-sleep_quality_count.columns = ['sleep_quality', 'count']
-fig19 = px.bar(sleep_quality_count, x='sleep_quality', y='count',
+# 19. BMI Distribution
+st.subheader("19. BMI Distribution")
+fig19 = px.histogram(filtered_df, x='bmi', nbins=20,
+                     labels={'bmi': 'BMI'},
+                     title='BMI Distribution')
+st.plotly_chart(fig19, use_container_width=True, key='fig19')
+
+# 20. Counts of Sleep Quality Categories
+st.subheader("20. Counts of Sleep Quality Categories")
+sleep_quality_counts = filtered_df['sleep_quality'].value_counts().reset_index()
+sleep_quality_counts.columns = ['sleep_quality', 'count']
+fig20 = px.bar(sleep_quality_counts, x='sleep_quality', y='count',
                labels={'sleep_quality': 'Sleep Quality', 'count': 'Count'},
-               title='Count of Participants by Sleep Quality')
-st.plotly_chart(fig19)
-
-# 20. Bar plot: Count of Participants by Stress Level
-st.subheader("Count of Participants by Stress Level")
-stress_level_count = df['stress_level'].value_counts().reset_index()
-stress_level_count.columns = ['stress_level', 'count']
-fig20 = px.bar(stress_level_count, x='stress_level', y='count',
-               labels={'stress_level': 'Stress Level', 'count': 'Count'},
-               title='Count of Participants by Stress Level')
-st.plotly_chart(fig20)
+               title='Counts of Sleep Quality Categories')
+st.plotly_chart(fig20, use_container_width=True, key='fig20')
