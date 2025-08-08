@@ -189,12 +189,11 @@ fig20 = px.bar(sleep_quality_counts, x='sleep_quality', y='count',
 st.plotly_chart(fig20, use_container_width=True, key='fig20')
 
 # Machine Learning Section
-
 st.header("Machine Learning Models: Predicting Sleep Hours")
 
 filtered_df_ml = filtered_df.copy()
 
-# Map categorical variables to numeric
+# Map categorical variables to numeric for ML
 filtered_df_ml['stress_level_num'] = filtered_df_ml['stress_level'].map({'Low': 1, 'Medium': 2, 'High': 3})
 filtered_df_ml['sleep_quality_num'] = filtered_df_ml['sleep_quality'].map({'Poor': 1, 'Average': 2, 'Good': 3})
 
