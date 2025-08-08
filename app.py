@@ -5,10 +5,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 st.set_page_config(page_title="Sleep Health & Lifestyle Analysis", layout="wide")
+import os
 
 @st.cache_data
 def load_data():
-    return pd.read_csv('Sleep_Health_Lifestyle_Analysis.csv')
+    base_dir = os.path.dirname(__file__)  # folder gde se nalazi app.py
+    csv_path = os.path.join(base_dir, 'Sleep_Health_Lifestyle_Analysis.csv')
+    return pd.read_csv(csv_path)
 
 @st.cache_data
 def filter_data(df, genders, stress_levels, sleep_qualities, age_range):
