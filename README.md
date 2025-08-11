@@ -1,15 +1,13 @@
 # Sleep Health & Lifestyle Analysis
 
-## Live Demo
+## Live Demo  
 https://sleep-health-lifestyle-analysis-49cnedggbws6u4y7atk85s.streamlit.app/
 
-## Project Overview
-This project analyzes how lifestyle factors affect sleep quality using a health dataset. It includes data cleaning, exploratory analysis, and an interactive Streamlit dashboard.
+## Project Overview  
+This project analyzes the relationship between lifestyle factors and sleep quality using a health dataset. It includes data cleaning, exploratory data analysis, and an interactive Streamlit dashboard to visualize insights.
 
-## Dataset
-The dataset contains information on age, gender, BMI, sleep hours, sleep quality, stress levels, physical activity, and heart rate. It is sourced from Kaggle and anonymized.
-
-## Data Dictionary
+## Dataset  
+The dataset contains anonymized participant data with the following features:
 
 | Column Name       | Description                           |
 |-------------------|-------------------------------------|
@@ -22,41 +20,47 @@ The dataset contains information on age, gender, BMI, sleep hours, sleep quality
 | physical_activity | Daily physical activity in minutes   |
 | heart_rate        | Average resting heart rate (bpm)     |
 
-## Goals
-To understand how BMI, stress, physical activity, gender, and age relate to sleep quality and duration.
+## Goals  
+- Investigate how BMI, stress, physical activity, gender, and age affect both sleep quality and duration.  
+- Identify key lifestyle factors that contribute most significantly to healthy sleep patterns.  
+- Provide clear, visual insights through an interactive dashboard to support better understanding of sleep health.  
+- Lay the groundwork for predictive modeling of sleep outcomes based on lifestyle and biometric data.
 
-## Questions
+## Questions  
 - Does BMI affect sleep duration and quality?  
 - How do stress levels influence sleep?  
 - Are there differences in sleep quality by gender and age?  
 - How does physical activity impact sleep?
 
-## Methods
-- Loaded and cleaned data using Pandas  
-- Explored data with Seaborn, Matplotlib, and Plotly  
-- Created an interactive dashboard using Streamlit  
+## Methods  
+- Data loading and cleaning using Pandas  
+- Exploratory data analysis and visualization with Seaborn, Matplotlib, and Plotly Express  
+- Interactive dashboard development using Streamlit  
 
-## Tools
+## Tools  
 - Python (Pandas, NumPy)  
 - Seaborn, Matplotlib, Plotly Express  
-- Streamlit
+- Streamlit  
 
-## Future Work
-- Add machine learning models to predict sleep quality and duration  
-- Deploy app on a public platform  
-- Improve dashboard interactivity and UI
+## Future Work  
+- Incorporate additional lifestyle and environmental variables to deepen analysis.  
+- Develop advanced machine learning models for personalized sleep quality and duration prediction.  
+- Enhance dashboard interactivity and customization options.  
+- Improve model accuracy with more diverse and larger datasets.
 
-## How to Run
-1. Clone the repo  
+## How to Run  
+1. Clone the repository  
 2. Install dependencies:  
    `pip install -r requirements.txt`  
 3. Run the app:  
    `streamlit run app.py`  
-4. Use sidebar filters to explore the data
+4. Use the sidebar filters to explore the data and model outputs interactively.
 
-## Ethics
-- Dataset is anonymized to protect privacy  
-- Results are for informational use only, not medical advice
+## Ethics  
+- The dataset is fully anonymized to ensure participant privacy.  
+- This project is intended for educational and informational purposes only, not as medical advice.
 
-## Author
-Milos Visnjic
+## Author  
+Milos Visnjic  
+GitHub: https://github.com/Miloss11  
+Streamlit app: https://sleep-health-lifestyle-analysis-49cnedggbws6u4y7atk85s.streamlit.app/
