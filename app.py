@@ -22,31 +22,62 @@ df = load_data()
 
 with st.sidebar.expander("Filter Options", expanded=True):
     genders = df['gender'].unique().tolist()
-    selected_genders = st.multiselect("Select Gender(s)", genders, default=genders)
+    selected_genders = st.multiselect(
+        "Select Gender(s)", 
+        genders, 
+        default=genders,
+        help="Choose one or more genders to filter the data by."
+    )
     if not selected_genders:
         selected_genders = genders
 
     stress_levels = df['stress_level'].unique().tolist()
-    selected_stress_levels = st.multiselect("Select Stress Level(s)", stress_levels, default=stress_levels)
+    selected_stress_levels = st.multiselect(
+        "Select Stress Level(s)", 
+        stress_levels, 
+        default=stress_levels,
+        help="Filter participants based on their self-reported stress levels (Low, Medium, High)."
+    )
     if not selected_stress_levels:
         selected_stress_levels = stress_levels
 
     sleep_qualities = df['sleep_quality'].unique().tolist()
-    selected_sleep_qualities = st.multiselect("Select Sleep Quality(ies)", sleep_qualities, default=sleep_qualities)
+    selected_sleep_qualities = st.multiselect(
+        "Select Sleep Quality(ies)", 
+        sleep_qualities, 
+        default=sleep_qualities,
+        help="Filter by sleep quality ratings on a scale from Poor to Good."
+    )
     if not selected_sleep_qualities:
         selected_sleep_qualities = sleep_qualities
 
     min_age, max_age = int(df['age'].min()), int(df['age'].max())
-    age_range = st.slider("Select Age Range", min_age, max_age, (min_age, max_age))
+    age_range = st.slider(
+        "Select Age Range", 
+        min_age, max_age, (min_age, max_age),
+        help="Choose the age range of participants to include in the analysis."
+    )
 
     min_bmi, max_bmi = float(df['bmi'].min()), float(df['bmi'].max())
-    bmi_range = st.slider("Select BMI Range", min_bmi, max_bmi, (min_bmi, max_bmi))
+    bmi_range = st.slider(
+        "Select BMI Range", 
+        min_bmi, max_bmi, (min_bmi, max_bmi),
+        help="Filter participants by Body Mass Index (BMI)."
+    )
 
     min_pa, max_pa = int(df['physical_activity'].min()), int(df['physical_activity'].max())
-    physical_activity_range = st.slider("Select Physical Activity Range", min_pa, max_pa, (min_pa, max_pa))
+    physical_activity_range = st.slider(
+        "Select Physical Activity Range", 
+        min_pa, max_pa, (min_pa, max_pa),
+        help="Filter based on daily physical activity measured in minutes."
+    )
 
     min_hr, max_hr = int(df['heart_rate'].min()), int(df['heart_rate'].max())
-    heart_rate_range = st.slider("Select Heart Rate Range", min_hr, max_hr, (min_hr, max_hr))
+    heart_rate_range = st.slider(
+        "Select Heart Rate Range", 
+        min_hr, max_hr, (min_hr, max_hr),
+        help="Filter participants by their average resting heart rate (beats per minute)."
+    )
 
 filtered_df = df[
     (df['gender'].isin(selected_genders)) &

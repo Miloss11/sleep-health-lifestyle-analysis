@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo "Starting setup..."
+
+# Install project dependencies from requirements.txt
+pip install -r requirements.txt
+
+# Create Streamlit config folder if it doesn't exist
+mkdir -p ~/.streamlit/
+
+# Write Streamlit config file for deployment
+echo "\
+[server]\n\
+headless = true\n\
+port = \$PORT\n\
+enableCORS = false\n\
+\n\
+" > ~/.streamlit/config.toml
+
+echo "Setup finished."
