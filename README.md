@@ -3,6 +3,8 @@
 ## Live Demo  
 https://sleep-health-lifestyle-analysis-49cnedggbws6u4y7atk85s.streamlit.app/
 
+![Sleep Illustration](images/sleep-illustration.png)
+
 ## Project Overview  
 This project analyzes the relationship between lifestyle factors and sleep quality using a health dataset. It includes data cleaning, exploratory data analysis, and an interactive Streamlit dashboard to visualize insights.
 
